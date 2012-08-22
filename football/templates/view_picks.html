@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block main_header %}{{ object_description }}{% endblock %}
+
+{% block content %}
+	<p>
+		<b>Game:</b>
+		{{ game.away_team.nickname }}{% if game.away_team_rank %} ({{ game.away_team_rank }}){% endif %} 
+		@ {{ game.home_team.nickname }}{% if game.home_team_rank %} ({{ game.home_team_rank }}){% endif %}
+	</p>
+	<p><b>Spread:</b> {{ game.spread }}</p>
+	<table>
+		<tr>
+			<th>Choice:</th>
+			<td>{{ pick.choice.nickname }}</td>
+		</tr>
+	</table>
+{% endblock %}

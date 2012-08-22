@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }}'s Board{% endblock %}
+
+{% block welcome %}
+	{% if current_user.username %}
+		<p class='welcome'>Welcome, {{ current_user.first_name }}!  <a href="/accounts/logout/">Logout</a></p>
+	{% else %}
+		<p class='welcome'><a href="/accounts/login">Log in</a></p>
+	{% endif %}
+	{% if current_user.is_staff %}
+		<p class='welcome'><a href="/admin">Admin Page</a></p>
+	{% endif %}
+{% endblock %}
+
+{% block main_header %}{{ user.username}}'s Board{% endblock %}
+
+{% block content %}
+	{% if messages %}
+		{% for message in messages %}
+			<p class="message">{{ message }}</p>
+		{% endfor %}
+	{% endif %}
+	
+	{% if current_week %}
+		<h3>This week's games:</h3>
+		<table>
+			<tr>
+				<th>Game</th>
+				<th>Spread</th>
+				<th>Your Pick</th>
+			</tr>
+			{% for game in current_games_list %}
+			<tr>
+				<td><a href="/team/{{ game.away_team.id }}">{{ game.away_team.nickname }}</a>
+					{% if game.away_team_rank %}
+						({{ game.away_team_rank }}) 
+					{% endif %}
+					@ <a href="/team/{{ game.home_team.id }}">{{ game.home_team.nickname }}</a>
+					{% if game.home_team_rank %}
+						 ({{ game.home_team_rank }})
+					{% endif %}
+				</td>
+				<td>{{ game.spread }}</td>
+				<td>
+					{% ifequal user current_user %}
+						<a href="/{{ user.username }}/{{ game.id }}">
+						{% for key, value in current_user_picks.items %}
+							{% ifequal game.id key %}
+								{{ value }}
+							{% endifequal %}
+						{% endfor %}
+						</a>
+					{% else %}
+						{% for key, value in current_user_picks.items %}
+							{% ifequal game.id key %}
+								{% ifequal value 'create' %}
+									none
+								{% else %}
+									{{ value }}
+								{% endifequal %}
+							{% endifequal %}
+						{% endfor %}
+					{% endifequal %}
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+		<p><em>Picks for this week are due by {{ current_week.picks_due_date|date:"m/d \a\t P" }}.</em></p>
+	{% endif %}
+	
+	<h3>So far this season . . .</h3>
+	<p>Your win percentage is {{ correct_percentage }}%</p>
+	<table>
+		<tr>
+			<th>Week</th>
+			<th>Game</th>
+			<th>Spread</th>
+			<th>Game Winner</th>
+			<th>Final Score</th>
+			<th>Your Pick</th>
+		</tr>
+		{% for game in previous_games_list %}
+		<tr>
+			<td>{{ game.week.season_week }}</td>
+			<td><a href="/team/{{ game.away_team.id }}">{{ game.away_team.nickname }}</a>
+				{% if game.away_team_rank %}
+					({{ game.away_team_rank }}) 
+				{% endif %}
+				@ <a href="/team/{{ game.home_team.id }}">{{ game.home_team.nickname }}</a>
+				{% if game.home_team_rank %}
+					 ({{ game.home_team_rank }})
+				{% endif %}
+			</td>
+			<td>{{ game.spread }}</td>
+			<td>
+				{% if game.winner %}
+					{% ifequal game.winner 'H' %}
+						{{ game.home_team.nickname }}
+					{% else %}
+						{{ game.away_team.nickname }}
+					{% endifequal %}
+				{% else %}
+					-
+				{% endif %}
+			</td>
+			<td>
+				{% ifnotequal game.home_score None %}
+					{{ game.away_score }} - {{ game.home_score }}
+				{% else %}
+					-
+				{% endifnotequal %}
+			</td>
+			{% for pick in previous_user_picks %}
+				{% ifequal game pick.game %}
+					{% if pick.correct %}
+						<td class="correct">{{ pick.choice.nickname }}</td>
+					{% else %}
+						<td class="incorrect">{{ pick.choice.nickname }}</td>
+					{% endif %}
+				{% endifequal %}
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</table>
+{% endblock %}

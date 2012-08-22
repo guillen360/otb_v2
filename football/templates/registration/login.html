@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block main_header %}Login Page{% endblock %}
+
+{% block content %}
+	<h3>Please enter your username and password:</h3>
+	{% if form.errors %}
+		<p class="error"><strong>Sorry, that is not a valid username or password!</strong></p>
+	{% endif %}
+	
+	<form action="." method="post">
+        {% csrf_token %}
+		<table>
+			<tr>
+				<th>{{ form.username.label_tag }}</th>
+				<td>{{ form.username }}</td>
+			</tr>
+			<tr>
+				<th>{{ form.password.label_tag }}</th>
+				<td>{{ form.password }}</td>
+			</tr>
+		</table>
+		<p>
+			<input type="submit" value="login" />
+		</p>
+		<input type="hidden" name="next" value="{% ifequal next "" %}/scoreboard{% else %}{{ next }}{% endifequal %}" />
+	</form>
+{% endblock %}

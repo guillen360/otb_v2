@@ -1,0 +1,53 @@
+body {
+    font-family: Verdana, Geneva, Arial, sans-serif;
+    font-size: small;
+}
+
+h1, h2, h3 {
+    font-weight: normal;
+}
+
+h1 {
+    color: teal;
+    border-bottom: thin dotted #888888;
+}
+
+table {
+    margin-left: 20px;
+    margin-right: 20px;
+    border: thin solid black;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: thin dotted gray;
+    padding: 5px;
+    text-align: center;
+}
+
+th {
+    color: white;
+    background-color: teal;
+}
+
+td.correct {
+    background-color: #99cc33;
+}
+
+td.incorrect {
+    background-color: #ff3333;
+}
+
+td.totals {
+    text-align: right;
+    font-weight: bold;
+}
+
+.welcome {
+    text-align: right;
+}
+
+.message {
+    color: #2E0854;
+    font-weight: bold;
+}

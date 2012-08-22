@@ -1,0 +1,59 @@
+- change DB to local MySQL
+
++ create dashboard for user to see games they need to make picks for and to manage their picks
++ create dashboard showing picks for all users for a week, all users choices, correct percentages for the season
++ create admin page for john
++ create team info page
+
+-----------
+Team Info Page Thoughts
+
++ link from scorebaord/dashboard to team info page
++ see results for season
++ color score cells for wins/losses
+
+-----------
+John's Admin Page Thoughts
++ remove "recent actions"
++ remove "sites" from home page
++ users: remove filters from side, change list columns to be more relevant
++ weeks: put games inline
++ automatically update user correct percentages when a game winner marked?
++ automatically mark picks as correct/not when a game winner marked?
++ validation for uniqueness of usernames
+----------
+
+----------
+Dashboard Thoughts
++ this week's games
++ figure out regex for username
++ create/edit picks for this week's games
++ link to create/edit picks be conditional: show pick name if already chosen, show "create" if no pick
++ make pick editing/creation actually work!!
++ when editing pick only show teams in that game, no other info
++ change bottom to show time that picks are due by
++ filter on winner so it says team name, not "H" or "A"
++ filter to make final score prettier?
++ change text on create_pick (naming, etc.) to make it clear it is for create/editing picks
++ table showing how i did last week (or maybe all season?)
++ my total points/percentage
++ create css file, include coloration for correct vs. incorrect picks in table
++ security/validation so you can't edit picks after the due date
++ security so only user can go to edit view of users picks
++ success message after pick created/edited
++ fix ranking stuffs!
++ change text on picks create/edit page to have info about specific game
++ validation on pickig OU (? or maybe another team) to warn them they're picking a lame team
++ link to this week dashboard so i can see who everyone else picked
++ link to all weeks board so i can see how everyone else is doing
+-----------
+
+-----------
+This Week Dashboard
++ table with all users, games for this week
++ link to the_board page of each user
++ links to each pick of current user
++ table with all users, games for all weeks
++ put links to this page on the bottom of all pages?
++ fix redirect on login to go to this page
+-----------

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}{{ team.nickname}}{% endblock %}
+
+{% block welcome %}
+	{% if current_user.username %}
+		<p class='welcome'>Welcome, {{ current_user.first_name }}!  <a href="/accounts/logout/">Logout</a></p>
+	{% else %}
+		<p class='welcome'><a href="/accounts/login">Log in</a></p>
+	{% endif %}
+	{% if current_user.is_staff %}
+		<p class='welcome'><a href="/admin">Admin Page</a></p>
+	{% endif %}
+{% endblock %}
+
+{% block main_header %}{{ team.nickname }}{% endblock %}
+
+{% block content %}
+<h3>Team Info</h3>
+<p><b>School:</b> {{ team.school }}</p>
+<p><b>Mascot:</b> {{ team.mascot }}</p>
+
+<h3>So far this season . . . </h3>
+<table>
+	<tr>
+		<th>Date</th>
+		<th>Rank</th>
+		<th>Spread</th>
+		<th>Opponent</th>
+		<th>Home/Away?</th>
+		<th>Final Score</th>
+	</tr>
+	{% for game in team_games %}
+		<tr>
+			<td>{{ game.game_date|date:"m/d, P" }}</td>
+			{% ifequal game.home_team team %}
+				{% if game.home_team_rank %}
+					<td>{{ game.home_team_rank }}</td>
+				{% else %}
+					<td>-</td>
+				{% endif %}
+				<td>{{ game.spread }}</td>
+				<td>
+					{{ game.away_team.nickname }}
+					{% if game.away_team_rank %}
+						 ({{ game.away_team_rank }})
+					{% endif %}
+				</td>
+				<td>Home</td>
+				{% ifnotequal game.away_score None %}
+					{% if game.home_team_won %}
+						<td class="correct">{{ game.away_score }} - {{ game.home_score }}</td>
+					{% else %}
+						<td class="incorrect">{{ game.away_score }} - {{ game.home_score }}</td>
+					{% endif %}
+				{% else %}
+					<td> </td>
+				{% endifnotequal %}
+			{% else %}
+				{% if game.away_team_rank %}
+					<td>{{ game.away_team_rank }}</td>
+				{% else %}
+					<td>-</td>
+				{% endif %}
+				<td>{{ game.spread }}</td>
+				<td>
+					{{ game.home_team.nickname }}
+					{% if game.home_team_rank %}
+						 ({{ game.home_team_rank }})
+					{% endif %}
+				</td>
+				<td>Away</td>
+				{% ifnotequal game.away_score None %}
+					{% if game.home_team_won %}
+						<td class="incorrect">{{ game.away_score }} - {{ game.home_score }}</td>
+					{% else %}
+						<td class="correct">{{ game.away_score }} - {{ game.home_score }}</td>
+					{% endif %}
+				{% else %}
+					<td> </td>
+				{% endifnotequal %}
+			{% endifequal %}
+		</tr>
+	{% endfor %}
+</table>
+{% endblock %}
