@@ -1,16 +1,20 @@
 from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext
 from football.models import *
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseRedirect
 from django import forms
 from django.forms import widgets, ValidationError
-from datetime import *
+#from datetime import *
+from django.utils import timezone
+from django.core.urlresolvers import reverse
+from django.utils.timezone import make_aware
 
 def scoreboard(request):
-    users = User.objects.exclude(username='football')
+    users = User.objects.exclude(username='vip')
     user_profiles = UserProfile.objects.all()
     current_user = request.user
-    current_weeks = Week.objects.filter(picks_due_date__gt=datetime.now())
+    current_weeks = Week.objects.filter(picks_due_date__gt=timezone.now())
     week_counter = 1
     try:
         current_week = current_weeks[0]
@@ -19,7 +23,7 @@ def scoreboard(request):
         current_week = None
         current_games = None
 
-    previous_weeks = Week.objects.filter(picks_due_date__lt=datetime.now())
+    previous_weeks = Week.objects.filter(picks_due_date__lt=timezone.now())
     previous_games = []
     for week in previous_weeks:
         games = Game.objects.filter(week=week)
@@ -30,13 +34,16 @@ def scoreboard(request):
                                                   'current_games': current_games, 'user_profiles': user_profiles, 'previous_weeks': previous_weeks, 'previous_games': previous_games })
 
 def the_board(request, username):
-    user = get_object_or_404(User, username=username)
-    current_user = request.user
-    messages = user.get_and_delete_messages()
+    user = User.objects.filter(username=username)
+    if not user:
+        print 'error retrieving user info'
+
+    current_user = User.objects.filter(username=request.user)
+    messages = []
     profile = get_object_or_404(UserProfile, user=user)
     correct_percentage = profile.correct_percentage
 
-    current_week_array = Week.objects.filter(picks_due_date__gt=datetime.now())
+    current_week_array = Week.objects.filter(picks_due_date__gt=timezone.now())
     try:
         current_week = current_week_array[0]
         current_games_list = Game.objects.filter(week=current_week)
@@ -52,7 +59,7 @@ def the_board(request, username):
         current_games_list = None
         current_user_picks = None
 
-    previous_weeks = Week.objects.filter(picks_due_date__lt=datetime.now())
+    previous_weeks = Week.objects.filter(picks_due_date__lt=timezone.now())
     previous_games_list = []
     for week in previous_weeks:
         games = Game.objects.filter(week=week)
@@ -60,9 +67,18 @@ def the_board(request, username):
             previous_games_list.append(game)
     previous_user_picks = Pick.objects.filter(user=user)
 
-    return render_to_response('theboard.html', {'user': user, 'current_week': current_week,'current_games_list': current_games_list,
-                                                'current_user': current_user, 'current_user_picks': current_user_picks, 'previous_games_list': previous_games_list,
-                                                'previous_user_picks': previous_user_picks, 'correct_percentage': correct_percentage, 'messages': messages,})
+    context = {
+            'user': user[0],
+            'current_week': current_week,
+            'current_games_list': current_games_list,
+            'current_user': current_user[0],
+            'current_user_picks': current_user_picks,
+            'previous_games_list': previous_games_list,
+            'previous_user_picks': previous_user_picks,
+            'correct_percentage': correct_percentage,
+            'messages': messages,
+    }
+    return render_to_response('theboard.html', context)
 
 def game_date_compare(x, y):
     if x.game_date > y.game_date:
@@ -105,14 +121,15 @@ def create_edit_picks(request, username, game_id):
     choice_choices = [(game.home_team.id, game.home_team.nickname), (game.away_team.id, game.away_team.nickname)]
 
     if user != request.user:
-        user.message_set.create(message="You cannot edit %s's picks." %username)
-        url = '/otb/%s' %username
-        return HttpResponseRedirect(url)
+#        user.message_set.create(message="You cannot edit %s's picks." %username)
+        return HttpResponseRedirect(reverse('football.views.the_board', args=(username,)))
 
-    if datetime.now() > game.week.picks_due_date:
+    if timezone.now() > game.week.picks_due_date:
         title = 'View Your Pick!'
         object_description = 'View Your Pick!'
-        return render_to_response('view_picks.html', {'title': title, 'object_description': object_description, 'game': game, 'pick': pick[0], } )
+        return render_to_response('view_picks.html', {
+            'title': title, 'object_description': object_description, 'game': game, 'pick': pick[0],
+            } )
 
     if request.POST:
         if len(picks) > 0:
@@ -125,13 +142,13 @@ def create_edit_picks(request, username, game_id):
             pick.user = user
             pick.game = game
             pick.week = game.week
+
             pick.save()
-            if pick.choice.nickname == 'OU':
-                user.message_set.create(message="OU, huh?  Good luck with that.")
-            else:
-                user.message_set.create(message='OK, you picked %s.  Good luck!' %pick.choice.nickname)
-            url = '/otb/%s' %username
-            return HttpResponseRedirect(url)
+#            if pick.choice.nickname == 'OU':
+#                user.message_set.create(message="OU, huh?  Good luck with that.")
+#            else:
+#                user.message_set.create(message='OK, you picked %s.  Good luck!' %pick.choice.nickname)
+            return HttpResponseRedirect(reverse('football.views.the_board', args=(username,)))
     else:
         if len(picks) > 0:
             pick = picks[0]
@@ -140,4 +157,7 @@ def create_edit_picks(request, username, game_id):
             form = PicksForm(choice_choices=choice_choices)
         title = 'Make Your Pick!'
         object_description = 'Make Your Pick!'
-        return render_to_response('create_edit_picks.html', {'title': title, 'object_description': object_description, 'game': game, 'form': form})
+        return render_to_response('create_edit_picks.html', {
+            'title': title, 'object_description': object_description, 'game': game, 'form': form
+        }, context_instance=RequestContext(request)
+        )

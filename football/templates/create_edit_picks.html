@@ -5,12 +5,14 @@
 {% block main_header %}{{ object_description }}{% endblock %}
 
 {% block content %}
+    {% load football_extras %}
 	<p>
 		<b>Game:</b>
 		{{ game.away_team.nickname }}{% if game.away_team_rank %} ({{ game.away_team_rank }}){% endif %} 
 		@ {{ game.home_team.nickname }}{% if game.home_team_rank %} ({{ game.home_team_rank }}){% endif %}
 	</p>
-	<p><b>Spread:</b> {{ game.spread }}</p>
+{#	<p><b>Spread:</b> {{ game.spread }}</p>#}
+    <p><b>Spread:</b> {{ game|disp_spread }}</p>
 	<form action="." method="post">
         {% csrf_token %}
 		<table>

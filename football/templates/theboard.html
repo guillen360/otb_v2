@@ -16,6 +16,9 @@
 {% block main_header %}{{ user.username}}'s Board{% endblock %}
 
 {% block content %}
+
+    {% load football_extras %}
+
 	{% if messages %}
 		{% for message in messages %}
 			<p class="message">{{ message }}</p>
@@ -41,7 +44,8 @@
 						 ({{ game.home_team_rank }})
 					{% endif %}
 				</td>
-				<td>{{ game.spread }}</td>
+{#				<td>{{ game.spread }}</td>#}
+                <td>{{ game|disp_spread }}</td>
 				<td>
 					{% ifequal user current_user %}
 						<a href="/{{ user.username }}/{{ game.id }}">
@@ -92,7 +96,8 @@
 					 ({{ game.home_team_rank }})
 				{% endif %}
 			</td>
-			<td>{{ game.spread }}</td>
+{#			<td>{{ game.spread }}</td>#}
+            <td>{{ game|disp_spread }}</td>
 			<td>
 				{% if game.winner %}
 					{% ifequal game.winner 'H' %}

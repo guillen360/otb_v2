@@ -1,20 +1,38 @@
 from django import template
-from django.template.defaultfilters import stringfilter
 from django.contrib.auth.models import User
+from django.utils.safestring import mark_safe
+
+register = template.Library()
 
 def format_pick(pick, current_user):
     value = ''
     if type(pick) == User:
         if pick == current_user:
-            value = '<a href="/otb/' + pick.username + '/' + str(game.id) + '">create</a>'
+            value = '<a href="/' + pick.username + '/' + '">create</a>'
         else:
             value = 'none'
     else:
         if pick.user == current_user:
-            value = '<a href="/otb/' + pick.user.username + '/' + str(game.id) + '">' + pick.choice.nickname + '</a>'
+#        if pick == current_user:
+            value = '<a href="/' + pick.user.username + '/' + str(pick.game.id) + '">' + pick.choice.nickname + '</a>'
         else:
             value = pick.choice.nickname
+
+    value = mark_safe(value)
     return value
 
-register = template.Library()
+def disp_spread(game):
+    value = ''
+    if game.spread > 0:
+        value = '%s by %s' % (game.away_team.nickname, str(game.spread))
+    elif game.spread < 0:
+        value = '%s by %s' % (game.home_team.nickname, str((game.spread * (-1))))
+    else:
+        value = 'even'
+    return value
+
 register.filter('format_pick', format_pick)
+register.filter('disp_spread', disp_spread)
+
+if __name__ == "__main__":
+    print User

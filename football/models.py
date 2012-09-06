@@ -78,7 +78,7 @@ class Game(models.Model):
             profile.save()
 
     def user_picks(self):
-        users = User.objects.exclude(username='football')
+        users = User.objects.exclude(username='vip')
         user_picks = []
         for user in users:
             pick = Pick.objects.filter(game=self, user=user)

@@ -16,6 +16,8 @@
 {% block main_header %}{{ team.nickname }}{% endblock %}
 
 {% block content %}
+
+{% load football_extras %}
 <h3>Team Info</h3>
 <p><b>School:</b> {{ team.school }}</p>
 <p><b>Mascot:</b> {{ team.mascot }}</p>
@@ -39,7 +41,8 @@
 				{% else %}
 					<td>-</td>
 				{% endif %}
-				<td>{{ game.spread }}</td>
+{#				<td>{{ game.spread }}</td>#}
+                <td>{{ game|disp_spread }}</td>
 				<td>
 					{{ game.away_team.nickname }}
 					{% if game.away_team_rank %}
@@ -62,7 +65,8 @@
 				{% else %}
 					<td>-</td>
 				{% endif %}
-				<td>{{ game.spread }}</td>
+{#				<td>{{ game.spread }}</td>#}
+                <td>{{ game|disp_spread }}</td>
 				<td>
 					{{ game.home_team.nickname }}
 					{% if game.home_team_rank %}

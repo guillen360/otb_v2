@@ -16,7 +16,9 @@
 {% block main_header %}The Scoreboard{% endblock %}
 
 {% block content %}
+
     {% load football_extras %}
+
     {% if messages %}
         {% for message in messages %}
             <p class="message">{{ message }}</p>
@@ -45,7 +47,8 @@
                             ({{ game.home_team_rank }})
                         {% endif %}
                     </td>
-                    <td>{{ game.spread }}</td>
+{#                    <td>{{ game.spread }}</td>#}
+                    <td>{{ game|disp_spread }}</td>
                     {% for pick in game.user_picks %}
                         <td>
                             {{ pick|format_pick:current_user }}
@@ -82,7 +85,8 @@
                             ({{ game.home_team_rank }})
                         {% endif %}
                     </td>
-                    <td>{{ game.spread }}</td>
+{#                    <td>{{ game.spread }}</td>#}
+                    <td>{{ game|disp_spread }}</td>
                     <td>
                         {% if game.winner %}
                             {% ifequal game.winner 'H' %}
@@ -102,17 +106,21 @@
                         {% endifnotequal %}
                     </td>
                     {% for pick in game.user_picks %}
-                        <td>
-                            {{ pick|format_pick:current_user }}
-                        </td>
+                        {% ifequal game pick.game %}
+                            {% if pick.correct %}
+                                <td class="correct">{{ pick.choice.nickname }}</td>
+                            {% else %}
+                                <td class="incorrect">{{ pick.choice.nickname }}</td>
+                            {% endif %}
+                        {% endifequal %}
                     {% endfor %}
                 </tr>
             {% endfor %}
         {% endfor %}
         <tr class="totals">
             <td colspan=5 class="totals">Correct Percentage</td>
-            {% for user in user_list %}
-                {% for up in user_profile_list %}
+            {% for user in users %}
+                {% for up in user_profiles %}
                     {% ifequal up.user user %}
                         <td>{{ up.correct_percentage }}%</td>
                     {% endifequal %}
