@@ -112,6 +112,8 @@
                             {% else %}
                                 <td class="incorrect">{{ pick.choice.nickname }}</td>
                             {% endif %}
+                        {% else %}
+                            <td>no pick!</td>
                         {% endifequal %}
                     {% endfor %}
                 </tr>
